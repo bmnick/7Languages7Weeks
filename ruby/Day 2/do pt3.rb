@@ -1,0 +1,1 @@
+File.open(ARGV.pop).each {|f| puts f if f =~ (@r ||= /#{ARGV.pop}/)}
