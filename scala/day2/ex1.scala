@@ -3,7 +3,12 @@ def foldingCount(inList: List[String]) = {
 	inList.foldLeft(0)((count, curItem) => count + curItem.size)
 }
 
+def foldingCountAlt(inList: List[String]) = {
+	(0 /: inList) ((count, curItem) => count + curItem.size)
+}
+
 println("count of list [\"abcd\", \"b\"] should be 5, is: "+foldingCount(List("abcd", "b")))
+println("Alt count of list [\"abcd\", \"b\"] should be 5, is: "+foldingCountAlt(List("abcd", "b")))
 
 // Write a Censor trait with a method that will replace curse words
 // Shoot -> Pucky, Darn -> Beans
