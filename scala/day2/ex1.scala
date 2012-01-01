@@ -14,10 +14,33 @@ println("Alt count of list [\"abcd\", \"b\"] should be 5, is: "+foldingCountAlt(
 // Shoot -> Pucky, Darn -> Beans
 // Use a map to store curses and alternatives
 trait Censor {
-	val censorWords = Map("Shoot" -> "Pucky", "Darn" -> "Beans")
+	var censor_words:Map[String,String] = null
+
+	def censorWords():Map[String, String] = {
+		if(censor_words == null){
+			load_censor_words
+		}
+		censor_words
+	}
+
+	def load_censor_words() = {
+		val source = io.Source.fromFile("censors.json")
+		val lines = source.mkString
+		source.close()
+
+		val parsed = scala.util.parsing.json.JSON.parseFull(lines)
+
+		censor_words = parsed match {
+			case Some(map) => map.asInstanceOf[Map[String, String]] // Awful stuff, but give me my dynamic typing back if it's this type of language!
+			case _ => null
+		}
+	}
 	
 	def censor(dirty: String) = {
-		dirty.split(' ').map(word => if(censorWords.contains(word)) censorWords(word) else word).foldLeft("")((string, word) => string + " " + word)
+		val repl_dict = censorWords()
+		dirty.split("""[ ,]+""").map(word => 
+			if(repl_dict.contains(word)) repl_dict(word) else word).foldLeft("")((string, word) => 
+				string + " " + word)
 	}
 }
 
@@ -29,6 +52,7 @@ val cen = new Censorer
 
 println(cen.censor("Hello, World!"))
 println(cen.censor("Shoot Darn it all!"))
-println(cen.censor("Shoot, Darn it all!")) // TODO: currently not supported(splitting on ,s)
+println(cen.censor("Shoot, Darn it all!")) // TODO: currently modifies string slightly
 
 // Load the curses and alternatives from a file
+// JSON file input for the alternatives
